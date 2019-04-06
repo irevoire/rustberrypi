@@ -1,8 +1,15 @@
 use std::collections::HashMap;
 
+use clokwerk::{Scheduler, TimeUnits};
 use systemstat::{Platform, System};
 
-pub fn update(cookie: &String) {
+pub fn init(scheduler: &mut Scheduler, cookie: &String) {
+    let cookie = cookie.clone();
+
+    scheduler.every(5.seconds()).run(move || update(&cookie));
+}
+
+fn update(cookie: &String) {
     let sys = System::new();
     let mut param = HashMap::new();
 

@@ -1,6 +1,6 @@
 use std::{thread, time::Duration};
 
-use clokwerk::{Scheduler, TimeUnits};
+use clokwerk::Scheduler;
 
 mod init;
 mod modules;
@@ -10,15 +10,9 @@ fn main() {
 
     let cookie = init::init("bloubi");
     println!("Got the cookie: {}", cookie);
-    let tmpcookie = cookie.clone();
-    scheduler
-        .every(5.seconds())
-        .run(move || modules::cpu_temp::update(&tmpcookie));
 
-    let tmpcookie = cookie.clone();
-    scheduler
-        .every(1.minutes())
-        .run(move || modules::uptime::update(&tmpcookie));
+    modules::cpu_temp::init(&mut scheduler, &cookie);
+    modules::uptime::init(&mut scheduler, &cookie);
 
     loop {
         scheduler.run_pending();
