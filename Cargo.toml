@@ -1,10 +1,11 @@
 [package]
 name = "rustberrypi"
 version = "0.1.0"
-authors = ["pi"]
+authors = ["irevoire", "sanzen"]
 edition = "2018"
 
 [dependencies]
+kankyo = "*"
 reqwest = "*"
 systemstat = "*"
 clokwerk = "*"

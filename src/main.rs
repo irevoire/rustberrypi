@@ -1,17 +1,21 @@
 use std::{thread, time::Duration};
 
+use env_logger::Env;
+use log::info;
+
 use clokwerk::Scheduler;
 
 mod init;
 mod modules;
 
 fn main() {
-    env_logger::init();
+    kankyo::load().unwrap_or_else(|e| println!("No env file: {}", e));
+    env_logger::from_env(Env::default().default_filter_or("rustberrypi")).init();
 
     let mut scheduler = Scheduler::new();
 
     let cookie = init::init("bloubi");
-    println!("Got the cookie: {}", cookie);
+    info!("Got the cookie: {}", cookie);
 
     modules::cpu_temp::init(&mut scheduler, &cookie);
     modules::uptime::init(&mut scheduler, &cookie);
