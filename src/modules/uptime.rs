@@ -8,6 +8,8 @@ pub fn update(cookie: &String) {
 
     if let Ok(uptime) = sys.uptime() {
         param.insert("uptime", uptime.as_secs().to_string());
+    } else {
+        return;
     }
 
     let client = reqwest::Client::new();

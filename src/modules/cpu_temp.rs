@@ -8,6 +8,8 @@ pub fn update(cookie: &String) {
 
     if let Ok(cpu_temp) = sys.cpu_temp() {
         param.insert("cpu_temp", cpu_temp.to_string());
+    } else {
+        return;
     }
 
     let client = reqwest::Client::new();
