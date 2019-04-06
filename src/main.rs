@@ -6,6 +6,8 @@ mod init;
 mod modules;
 
 fn main() {
+    env_logger::init();
+
     let mut scheduler = Scheduler::new();
 
     let cookie = init::init("bloubi");

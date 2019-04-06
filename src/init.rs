@@ -1,3 +1,4 @@
+use log::info;
 use std::collections::HashMap;
 
 pub fn init(name: &str) -> String {
@@ -5,7 +6,7 @@ pub fn init(name: &str) -> String {
 
     param.insert("name", name);
 
-    println!("Sending reqwest");
+    info!("send reqwest to get a cookie");
 
     let client = reqwest::Client::new();
     let res = client

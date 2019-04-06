@@ -1,3 +1,4 @@
+use log::{info, warn};
 use std::collections::HashMap;
 
 use clokwerk::{Scheduler, TimeUnits};
@@ -7,17 +8,20 @@ pub fn init(scheduler: &mut Scheduler, cookie: &String) {
     let cookie = cookie.clone();
 
     scheduler.every(1.minutes()).run(move || update(&cookie));
+    info!("added uptime to the scheduler");
 }
 
 fn update(cookie: &String) {
     let sys = System::new();
     let mut param = HashMap::new();
 
-    if let Ok(uptime) = sys.uptime() {
-        param.insert("uptime", uptime.as_secs().to_string());
-    } else {
-        return;
-    }
+    match sys.uptime() {
+        Ok(u) => param.insert("uptime", u.as_secs().to_string()),
+        Err(e) => {
+            warn!("system doesn't allow to get the uptime: {}", e);
+            return;
+        }
+    };
 
     let client = reqwest::Client::new();
     let res = client
@@ -27,7 +31,7 @@ fn update(cookie: &String) {
         .send();
 
     match res {
-        Ok(_) => println!("Reqwest Ok"),
-        Err(e) => println!("Reqwest failed : {}", e),
+        Ok(_) => info!("Reqwest Ok"),
+        Err(e) => warn!("Reqwest failed : {}", e),
     };
 }
