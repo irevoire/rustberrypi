@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use systemstat::{Platform, System};
 
-pub fn update() {
+pub fn update(cookie: &String) {
     let sys = System::new();
     let mut param = HashMap::new();
 
@@ -12,7 +12,8 @@ pub fn update() {
 
     let client = reqwest::Client::new();
     let res = client
-        .post("http://192.168.0.21:3000/cpu_temp")
+        .post("http://192.168.0.21:3000/cpu")
+        .header("Cookie", cookie.as_bytes())
         .json(&param)
         .send();
 
