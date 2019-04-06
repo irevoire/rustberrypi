@@ -32,14 +32,22 @@ pub fn init() -> Args {
                 .short("s")
                 .long("server")
                 .env("SERVER")
-                .default_value("localhost:3000")
+                .default_value("http://localhost:3000")
                 .help("Set the server address to use")
                 .takes_value(true),
         )
         .get_matches();
     let name = matches.value_of("name").unwrap();
     let server = matches.value_of("server").unwrap();
+    let cookie = get_cookie(server, name);
 
+    return Args {
+        cookie: cookie.to_string(),
+        addr: server.to_string(),
+    };
+}
+
+fn get_cookie(server: &str, name: &str) -> String {
     let mut param = HashMap::new();
 
     param.insert("name", name);
@@ -48,7 +56,7 @@ pub fn init() -> Args {
 
     let client = reqwest::Client::new();
     let res = client
-        .post("http://192.168.0.21:3000/init")
+        .post(&format!("{}/init", server))
         .json(&param)
         .send()
         .unwrap();
@@ -56,8 +64,5 @@ pub fn init() -> Args {
     let cookie = res.headers().get("set-cookie").unwrap();
     let cookie = cookie.to_str().unwrap().split(";").next().unwrap();
 
-    return Args {
-        cookie: cookie.to_string(),
-        addr: server.to_string(),
-    };
+    return cookie.to_string();
 }
