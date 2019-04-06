@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 kankyo = "*"
+clap = "*"
 reqwest = "*"
 systemstat = "*"
 clokwerk = "*"
