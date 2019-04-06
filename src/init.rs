@@ -12,15 +12,19 @@ pub fn init() -> Args {
     kankyo::load().unwrap_or_else(|e| println!("No env file: {}", e));
     env_logger::from_env(Env::default().default_filter_or("rustberrypi")).init();
 
-    let matches = App::new("rustberrypy")
-        .author("irevoire <irevoire.ovh>")
-        .about("Monitor raspberry pi")
+    let matches = App::new("Rustberrypy 🦀🍇")
+        .author(
+            "irevoire\t<http://github.com/irevoire>\n\
+             Sanzen\t\t<http://github.com/mlemesle>",
+        )
+        .about("Monitoring raspberry pi")
         .arg(
             Arg::with_name("name")
                 .short("n")
                 .long("name")
                 .env("NAME")
                 .default_value("pi") // TODO hostname
+                .help("Set the name you'll be identified by")
                 .takes_value(true),
         )
         .arg(
@@ -29,6 +33,7 @@ pub fn init() -> Args {
                 .long("server")
                 .env("SERVER")
                 .default_value("localhost:3000")
+                .help("Set the server address to use")
                 .takes_value(true),
         )
         .get_matches();
