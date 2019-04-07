@@ -1,24 +1,33 @@
-use log::{info, warn};
+use log::{error, info, warn};
 use std::collections::HashMap;
 
 use clokwerk::{Scheduler, TimeUnits};
 use systemstat::{Platform, System};
 
 pub fn init(scheduler: &mut Scheduler, cookie: &String) {
+    if let Err(e) = update(&cookie) {
+        error!("cpu_temp will not be added to the scheduler: {}", e);
+        return;
+    }
+
     let cookie = cookie.clone();
 
-    scheduler.every(5.seconds()).run(move || update(&cookie));
+    scheduler
+        .every(5.seconds())
+        .run(move || update(&cookie).unwrap_or(()));
 }
 
-fn update(cookie: &String) {
+fn update(cookie: &String) -> Result<(), String> {
     let sys = System::new();
     let mut param = HashMap::new();
 
     match sys.cpu_temp() {
         Ok(cput) => param.insert("cpu_temp", cput.to_string()),
         Err(e) => {
-            warn!("system doesn't allow to get the uptime: {}", e);
-            return;
+            return Err(format!(
+                "Your system don't allow getting cpu temperature: {}",
+                e
+            ));
         }
     };
 
@@ -30,7 +39,8 @@ fn update(cookie: &String) {
         .send();
 
     match res {
-        Ok(_) => info!("Reqwest Ok"),
-        Err(e) => warn!("Reqwest failed : {}", e),
+        Ok(_) => info!("cpu_temp updated"),
+        Err(e) => warn!("cpu_temp failed: {}", e),
     };
+    Ok(())
 }
