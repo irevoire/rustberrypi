@@ -1,11 +1,18 @@
 use clokwerk::Scheduler;
+use log::error;
 use std::{thread, time::Duration};
 
 mod init;
 mod modules;
 
 fn main() {
-    let args = init::init();
+    let args = match init::init() {
+        Ok(a) => a,
+        Err(e) => {
+            error!("{}", e);
+            return;
+        }
+    };
 
     let mut scheduler = Scheduler::new();
 

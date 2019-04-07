@@ -8,7 +8,7 @@ pub struct Args {
     pub cookie: String,
 }
 
-pub fn init() -> Args {
+pub fn init() -> Result<Args, String> {
     kankyo::load().unwrap_or_else(|e| println!("No env file: {}", e));
     env_logger::from_env(Env::default().default_filter_or("rustberrypi")).init();
 
@@ -39,15 +39,15 @@ pub fn init() -> Args {
         .get_matches();
     let name = matches.value_of("name").unwrap();
     let server = matches.value_of("server").unwrap();
-    let cookie = get_cookie(server, name);
+    let cookie = get_cookie(server, name)?;
 
-    return Args {
-        cookie: cookie.to_string(),
+    return Ok(Args {
+        cookie: cookie,
         addr: server.to_string(),
-    };
+    });
 }
 
-fn get_cookie(server: &str, name: &str) -> String {
+fn get_cookie(server: &str, name: &str) -> Result<String, String> {
     let mut param = HashMap::new();
 
     param.insert("name", name);
@@ -55,14 +55,22 @@ fn get_cookie(server: &str, name: &str) -> String {
     info!("send reqwest to get a cookie");
 
     let client = reqwest::Client::new();
-    let res = client
-        .post(&format!("{}/init", server))
-        .json(&param)
-        .send()
-        .unwrap();
+    let res = client.post(&format!("{}/init", server)).json(&param).send();
+    let res = match res {
+        Ok(r) => r,
+        Err(e) => return Err(format!("Could not request a cookie: {}", e)),
+    };
 
-    let cookie = res.headers().get("set-cookie").unwrap();
-    let cookie = cookie.to_str().unwrap().split(";").next().unwrap();
+    let cookie = match res.headers().get("set-cookie") {
+        Some(c) => c,
+        None => return Err("There is no cookie in the header!".to_string()),
+    };
+    let cookie = match cookie.to_str().unwrap().split(";").next() {
+        Some(c) => c,
+        None => {
+            return Err(format!("Bad format in cookie: {:?}", cookie));
+        }
+    };
 
-    return cookie.to_string();
+    return Ok(cookie.to_string());
 }
