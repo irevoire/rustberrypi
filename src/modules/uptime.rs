@@ -1,7 +1,6 @@
-use log::{error, info, warn};
 use std::collections::HashMap;
 
-use clokwerk::{Scheduler, TimeUnits};
+use clokwerk::TimeUnits;
 use systemstat::{Platform, System};
 
 new_module!(uptime, 1.minutes(), {

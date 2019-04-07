@@ -1,9 +1,10 @@
 #[macro_export]
 macro_rules! new_module {
     ($mod_name:ident, $duration:expr, $code:block) => {
-        pub fn init(scheduler: &mut Scheduler, cookie: &String) {
-            if let Err(err) = update(&cookie) {
-                error!(
+        use $crate::init::Args;
+        pub fn init(scheduler: &mut clokwerk::Scheduler, args: &Args) {
+            if let Err(err) = update(&args.cookie) {
+                log::error!(
                     "{} will not be added to the scheduler: {}",
                     stringify!($mod_name),
                     err
@@ -11,7 +12,7 @@ macro_rules! new_module {
                 return;
             }
 
-            let cookie = cookie.clone();
+            let cookie = args.cookie.clone();
 
             scheduler
                 .every($duration)
@@ -32,8 +33,8 @@ macro_rules! new_module {
                 .send();
 
             match res {
-                Ok(_) => info!("{} updated", stringify!($mod_name)),
-                Err(e) => warn!("{} failed: {}", stringify!($mod_name), e),
+                Ok(_) => log::info!("{} updated", stringify!($mod_name)),
+                Err(e) => log::warn!("{} failed: {}", stringify!($mod_name), e),
             };
             Ok(())
         }

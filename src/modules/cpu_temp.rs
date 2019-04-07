@@ -1,10 +1,9 @@
-use log::{error, info, warn};
 use std::collections::HashMap;
 
-use clokwerk::{Scheduler, TimeUnits};
+use clokwerk::TimeUnits;
 use systemstat::{Platform, System};
 
-new_module!(cpu_temp, 5.seconds(), {
+new_module!(cpu, 5.seconds(), {
     let sys = System::new();
     let mut param = HashMap::new();
 

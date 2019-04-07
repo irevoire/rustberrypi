@@ -16,8 +16,8 @@ fn main() {
 
     let mut scheduler = Scheduler::new();
 
-    modules::cpu_temp::init(&mut scheduler, &args.cookie);
-    modules::uptime::init(&mut scheduler, &args.cookie);
+    modules::cpu_temp::init(&mut scheduler, &args);
+    modules::uptime::init(&mut scheduler, &args);
 
     loop {
         scheduler.run_pending();
